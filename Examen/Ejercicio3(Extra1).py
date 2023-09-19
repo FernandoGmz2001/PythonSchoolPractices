@@ -16,10 +16,10 @@
 # La informacion tiene que ser capturada por el usuario
 
 class Item:
-    def __init__(self, nombre, cantidad, precio):
+    def __init__(self, nombre, cantidad, valor, porcentaje_iva):
         self.nombre = nombre
         self.cantidad = cantidad
-        self.precio = precio
+        self.precio = valor * (1 + porcentaje_iva)  # Se calcula el precio incluyendo el IVA
 
 class Locacion:
     def __init__(self, nombre, porcentaje_iva):
@@ -27,18 +27,17 @@ class Locacion:
         self.porcentaje_iva = porcentaje_iva
         self.items = []
 
-    def agregar_item(self, nombre, cantidad):
+    def agregar_item(self, nombre, cantidad, valor):
         for item in self.items:
             if item.nombre == nombre:
                 print(f"El item '{nombre}' ya existe en la locación.")
                 return
-        precio = cantidad * self.porcentaje_iva
-        nuevo_item = Item(nombre, cantidad, precio)
+        nuevo_item = Item(nombre, cantidad, valor, self.porcentaje_iva)
         self.items.append(nuevo_item)
         print(f"Item '{nombre}' agregado a la locación '{self.nombre}'.")
 
     def calcular_total(self):
-        total = sum(item.precio for item in self.items)
+        total = sum(item.precio * item.cantidad for item in self.items)  # Se calcula el total multiplicando precio por cantidad
         return total
 
 def main():
@@ -75,7 +74,8 @@ def main():
             locacion = locaciones[locacion_index]
             nombre = input("Ingrese el nombre del item: ")
             cantidad = int(input("Ingrese la cantidad: "))
-            locacion.agregar_item(nombre, cantidad)
+            valor = float(input("Ingrese el valor unitario: "))
+            locacion.agregar_item(nombre, cantidad, valor)
         
         elif opcion == "3":
             if not locaciones:
