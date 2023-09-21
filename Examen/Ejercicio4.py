@@ -8,16 +8,25 @@
 import csv
 import os
 
+def obtener_ruta(nombre_archivo):
+    directorio_actual = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(directorio_actual, nombre_archivo)
+
 def leer_csv(nombre_archivo):
     datos = []
-    if os.path.exists(nombre_archivo):
-        with open(nombre_archivo, newline='', encoding='utf-8') as archivo:
+    ruta_archivo = obtener_ruta(nombre_archivo)
+    try:
+        with open(ruta_archivo, newline='') as archivo:
             lector = csv.DictReader(archivo)
-            datos = [fila for fila in lector]
+            for fila in lector:
+                datos.append(fila)
+    except FileNotFoundError:
+        print("El archivo de entrada no se encuentra.")
     return datos
 
 def escribir_csv(datos, nombre_archivo):
-    with open(nombre_archivo, 'w', newline='', encoding='utf-8') as archivo:
+    ruta_archivo = obtener_ruta(nombre_archivo)
+    with open(ruta_archivo, 'w', newline='') as archivo:
         fieldnames = datos[0].keys()
         escritor = csv.DictWriter(archivo, fieldnames=fieldnames)
         escritor.writeheader()
@@ -25,40 +34,40 @@ def escribir_csv(datos, nombre_archivo):
 
 def procesar_archivo(entrada, salida):
     datos_entrada = leer_csv(entrada)
-    datos_salida = []
-    
-    for fila in datos_entrada:
-        nombre = fila['Nombre del producto']
-        precio = float(fila['Precio'])
-        cantidad_minima = int(fila['Cantidad minima a comprar'])
+    if datos_entrada:
+        datos_salida = []
+        for fila in datos_entrada:
+            nombre = fila["Nombre del producto"]
+            precio = fila["Precio"]
+            cantidad = fila["Cantidad minima a comprar"]
+            
+            # Verificar si ya existe un producto con el mismo nombre
+            existe = False
+            for producto in datos_salida:
+                if producto["Nombre del producto"] == nombre:
+                    existe = True
+                    # Comprobar si hay diferencias en precio o cantidad
+                    if producto["Precio"] != precio:
+                        print(f"El producto '{nombre}' tiene precios diferentes.")
+                        usuario_elige = input("¿Cuál precio desea conservar (Nuevo/Antiguo)? ").strip().lower()
+                        if usuario_elige == "nuevo":
+                            producto["Precio"] = precio
+                    if producto["Cantidad minima a comprar"] != cantidad:
+                        print(f"El producto '{nombre}' tiene cantidades diferentes.")
+                        usuario_elige = input("¿Cuál cantidad desea conservar (Nuevo/Antiguo)? ").strip().lower()
+                        if usuario_elige == "nuevo":
+                            producto["Cantidad minima a comprar"] = cantidad
+            if not existe:
+                datos_salida.append({"Nombre del producto": nombre, "Precio": precio, "Cantidad minima a comprar": cantidad})
         
-        # Verificar si ya existe un producto con el mismo nombre
-        existe = False
-        for producto in datos_salida:
-            if producto['Nombre del producto'] == nombre:
-                existe = True
-                # Verificar si hay diferencias en Precio o Cantidad minima a comprar
-                if producto['Precio'] != precio or producto['Cantidad minima a comprar'] != cantidad_minima:
-                    print(f"Se encontró un producto duplicado: {nombre}")
-                    print(f"Precio actual: {producto['Precio']}, Nuevo precio: {precio}")
-                    print(f"Cantidad actual: {producto['Cantidad minima a comprar']}, Nueva cantidad: {cantidad_minima}")
-                    opcion = input("Elija una opción (precio/nueva cantidad): ").strip().lower()
-                    if opcion == 'precio':
-                        producto['Precio'] = precio
-                    elif opcion == 'cantidad':
-                        producto['Cantidad minima a comprar'] = cantidad_minima
-                break
-        
-        if not existe:
-            datos_salida.append({'Nombre del producto': nombre, 'Precio': precio, 'Cantidad minima a comprar': cantidad_minima})
-    
-    escribir_csv(datos_salida, salida)
-    print("Proceso completado. El archivo de salida ha sido generado.")
+        escribir_csv(datos_salida, salida)
+        print("Archivo de salida creado con éxito.")
+    else:
+        print("No se pudieron procesar los datos de entrada.")
 
 def main():
-    archivo_entrada = input("Ingrese el nombre del archivo de entrada (.csv): ")
-    archivo_salida = input("Ingrese el nombre del archivo de salida (.csv): ")
-    
+    archivo_entrada = input("Ingrese el nombre del archivo de entrada (en formato CSV): ")
+    archivo_salida = input("Ingrese el nombre del archivo de salida (en formato CSV): ")
     procesar_archivo(archivo_entrada, archivo_salida)
 
 if __name__ == "__main__":
