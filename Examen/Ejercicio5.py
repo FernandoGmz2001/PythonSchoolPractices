@@ -27,16 +27,22 @@ inputString = ""
 for c in range(len(cadenas)):
     inputString += str(cadenas[c]) + " "
 
+palabras = []
+numeros = []
 
-print("String inicial =",inputString)
-palabras = inputString.split(" ")
-for w in range(len(palabras)):
-   palabras[w]=palabras[w].lower()
+for palabra in inputString.split():
+    if palabra.isnumeric():
+        numeros.append(palabra)
+    else:
+        palabras.append(palabra)
 
-for n in range(len(palabras)-1, 0, -1):
-   for i in range(n):
-      if palabras[i] > palabras[i + 1]:
+# Ordenar las listas por separado
+palabras.sort()
+numeros.sort()
 
-         palabras[i], palabras[i + 1] = palabras[i + 1], palabras[i]
+# Concatenar las listas para obtener la salida final
+palabras.extend(numeros)
 
-print("Palabras ordenadas: \n",palabras)
+# Imprimir el resultado
+print("Palabras ordenadas:")
+print(" ".join(palabras))
