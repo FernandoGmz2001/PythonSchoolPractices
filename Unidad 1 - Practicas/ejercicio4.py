@@ -25,14 +25,3 @@ print(f"Las materias de este semestre son las siguientes: {asignatura}")
 
 sum_creds = sum(dicc_reticula.values())
 print(f"La suma de los creditos del semestre es de : {sum_creds}")
-
-
-
-
-
-
-
-
-
-
-

@@ -5,14 +5,6 @@
 
 kwargs = dict([])
 
-# def suma(**kwargs):
-#     suma = 0
-#     for key, value in kwargs.items():
-#         print(value," : ",key)
-#         suma += value
-#     return suma
-
-
 while True:
     k = input("Escriba la llave: ")
     v = input("Escriba el valor: ")
